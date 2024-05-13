@@ -97,6 +97,25 @@ public class EmployeeController {
 
         return "redirect:/employees";
     }
+    //従業員更新画面表示
+    @GetMapping(value = "/{code}/update")
+    public String edit(@ModelAttribute Employee employee, @PathVariable String code, Model model ) {
+        //Modelに登録
+        model.addAttribute("employee", employeeService.findByCode(code));
+        //Employee更新画面に遷移
+        return "employees/update";
+    }
+
+    //従業員更新処理
+    @PostMapping(value = "{code}/update")
+    public String update( Employee employee) {
+        //Employee登録
+        employeeService.save(employee);
+
+        return "redirect:/employees";
+    }
+
+
 
     // 従業員削除処理
     @PostMapping(value = "/{code}/delete")

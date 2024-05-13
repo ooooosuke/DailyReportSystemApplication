@@ -51,7 +51,12 @@
                                         </form>
                                     </div>
                                     <div class="col-auto">
+                                        <a th:href="@{/employees/{code}/update(code=${code})}" class="btn btn-primary">更新</a>
+                                    </div>
+                                    <div class="col-auto">
                                         <a th:href="@{/employees}" class="btn btn-primary">戻る</a>
+                                    </div>
+                                     　　
                                     </div>
                                 </div>
                                 <span th:if="${deleteError} neq null" th:text="${deleteError}" class="text-danger"></span>

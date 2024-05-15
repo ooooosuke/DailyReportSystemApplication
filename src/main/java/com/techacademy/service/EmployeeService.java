@@ -43,14 +43,44 @@ public class EmployeeService {
         }
 
         employee.setDeleteFlg(false);
-
+        //現在の日時を取得し、now変数に格納
         LocalDateTime now = LocalDateTime.now();
+        //作成日時を現在の日時に設定
         employee.setCreatedAt(now);
+        //更新日時を現在の日時に設定
         employee.setUpdatedAt(now);
 
         employeeRepository.save(employee);
         return ErrorKinds.SUCCESS;
     }
+
+    // 従業員更新
+    @Transactional
+    public ErrorKinds update(Employee employee) {
+        // 更新対象の従業員コードに対応する従業員をデータベースから取得
+        Employee existingEmployee = findByCode(employee.getCode());
+
+        // 更新する各フィールドの値をセット
+        existingEmployee.setName(employee.getName());
+        existingEmployee.setRole(employee.getRole());
+
+        // パスワード更新がある場合のみエンコード
+        if (employee.getPassword() != null && !employee.getPassword().isEmpty()) {
+            ErrorKinds passwordCheckResult = employeePasswordCheck(employee);
+            if (passwordCheckResult != ErrorKinds.CHECK_OK) {
+                return passwordCheckResult;
+            }
+            existingEmployee.setPassword(passwordEncoder.encode(employee.getPassword()));
+        }
+
+        // 更新日時を設定
+        existingEmployee.setUpdatedAt(LocalDateTime.now());
+
+        // 従業員情報をデータベースに保存
+        employeeRepository.save(existingEmployee);
+        return ErrorKinds.SUCCESS;
+    }
+
 
     // 従業員削除
     @Transactional

@@ -22,11 +22,13 @@
                             <form th:action="@{/employees/{code}/update}" th:object="${employee}" th:method="post">
                                 <div class="wizard wizard-success mb-4">
                                     <div class="mb-3">
+                                        <p class="mb-1">パスワードは変更する場合のみ入力してください</p>
+                                    </div>
+                                    <div class="mb-3">
                                         <label class="form-label" for="code">社員番号</label>
                                         <p class="mb-1"></p>
-                                        <div class="col-md-7">
-                                            <input class="form-control" type="text" th:field="*{code}"  id="code">
-                                            <span th:errors="*{code}" class="text-danger"></span>
+                                        <div>
+                                            <input class="form-control" type="text" th:field="*{code}"  id="code"readonly>
                                         </div>
                                     </div>
                                     <div class="mb-3">

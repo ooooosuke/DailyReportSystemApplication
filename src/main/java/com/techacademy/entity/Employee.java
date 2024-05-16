@@ -1,4 +1,3 @@
-
 package com.techacademy.entity;
 
 import java.time.LocalDateTime;
@@ -14,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
+
 
 @Data
 @Entity
@@ -44,8 +44,7 @@ public class Employee {
 
     // 名前
     @Column(length = 20, nullable = false)
-    @NotEmpty
-    @Length(max = 20)
+
     private String name;
 
     // 権限

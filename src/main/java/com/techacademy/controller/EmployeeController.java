@@ -59,7 +59,6 @@ public class EmployeeController {
     // 従業員新規登録処理
     @PostMapping(value = "/add")
     public String add(@Validated Employee employee, BindingResult res, Model model) {
-
         // パスワード空白チェック
         /*
          * エンティティ側の入力チェックでも実装は行えるが、更新の方でパスワードが空白でもチェックエラーを出さずに
@@ -69,16 +68,12 @@ public class EmployeeController {
             // パスワードが空白だった場合
             model.addAttribute(ErrorMessage.getErrorName(ErrorKinds.BLANK_ERROR),
                     ErrorMessage.getErrorValue(ErrorKinds.BLANK_ERROR));
-
             return create(employee);
-
         }
-
         // 入力チェック
         if (res.hasErrors()) {
             return create(employee);
         }
-
         // 論理削除を行った従業員番号を指定すると例外となるためtry~catchで対応
         // (findByIdでは削除フラグがTRUEのデータが取得出来ないため)
         try {
@@ -88,13 +83,11 @@ public class EmployeeController {
                 model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
                 return create(employee);
             }
-
         } catch (DataIntegrityViolationException e) {
             model.addAttribute(ErrorMessage.getErrorName(ErrorKinds.DUPLICATE_EXCEPTION_ERROR),
                     ErrorMessage.getErrorValue(ErrorKinds.DUPLICATE_EXCEPTION_ERROR));
             return create(employee);
         }
-
         return "redirect:/employees";
     }
     //従業員更新画面表示
@@ -114,8 +107,15 @@ public class EmployeeController {
         if(res.hasErrors()) {
             return edit(employee,code,model);
         }
-        //Employee登録
-        employeeService.update(employee);
+
+        //Serviceの呼び出し
+            ErrorKinds result = employeeService.update(employee);
+        //保存処理の結果がErrorKindsに含まれているエラーであるかをチェック
+            if (ErrorMessage.contains(result)) {
+                //エラーメッセージをモデルに追加
+                model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
+                return edit(employee,code,model);
+            }
         //一覧画面にリダイレクト
         return "redirect:/employees";
     }

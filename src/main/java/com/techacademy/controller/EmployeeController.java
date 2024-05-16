@@ -103,9 +103,18 @@ public class EmployeeController {
     @PostMapping(value = "/{code}/update")
     public String update(@Validated Employee employee,String code, BindingResult res, Model model) {
 
-        //エラーあり
-        if(res.hasErrors()) {
-            return edit(employee,code,model);
+     // 名前空白チェック
+        if ("".equals(employee.getName())) {
+            res.rejectValue("name", "error.employee", "名前は必須です");
+        }
+        // 名前文字制限チェック
+        if (employee.getName().length() > 20) {
+            res.rejectValue("name", "error.employee", "名前は20文字以下で入力してください");
+        }
+        // エラーがある場合、再度更新画面を表示
+        if (res.hasErrors()) {
+            model.addAttribute("employee", employee);
+            return "employees/update";
         }
 
         //Serviceの呼び出し

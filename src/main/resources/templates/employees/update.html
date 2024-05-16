@@ -36,7 +36,8 @@
                                         <p class="mb-1"></p>
                                         <div class="col-md-7">
                                             <input class="form-control" type="text" th:field="*{name}" th:errorclass="err" id="name">
-                                            <span th:errors="*{name}" class="text-danger"></span>
+                                            <div th:if="${#fields.hasErrors('name')}" class="alert alert-danger" role="alert">
+                <div th:errors="*{name}">名前のエラー</div>
                                         </div>
                                     </div>
                                     <div class="mb-3">

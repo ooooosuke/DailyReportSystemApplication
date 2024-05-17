@@ -14,7 +14,7 @@
             <div class="container-fluid p-0">
                 <h1 class="h3 mb-3">従業員 更新画面</h1>
             </div>
-             <div class="col-12 col-xxl-6">
+            <div class="col-12 col-xxl-6">
 
                 <div class="col-xl-12">
                     <div class="card">
@@ -28,7 +28,7 @@
                                         <label class="form-label" for="code">社員番号</label>
                                         <p class="mb-1"></p>
                                         <div>
-                                            <input class="form-control" type="text" th:field="*{code}"  id="code"readonly>
+                                            <input class="form-control" type="text" th:field="*{code}" id="code" readonly>
                                         </div>
                                     </div>
                                     <div class="mb-3">
@@ -37,7 +37,8 @@
                                         <div class="col-md-7">
                                             <input class="form-control" type="text" th:field="*{name}" th:errorclass="err" id="name">
                                             <div th:if="${#fields.hasErrors('name')}" class="alert alert-danger" role="alert">
-                <div th:errors="*{name}">名前のエラー</div>
+                                                <div th:errors="*{name}">名前のエラー</div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="mb-3">
@@ -53,7 +54,7 @@
                                         <p class="mb-1"></p>
                                         <div class="col-md-4">
                                             <select class="form-select" th:field="*{role}" id="role">
-                                                <option th:each="item:${T(com.techacademy.entity.Employee.Role).values()}" th:value="${item}" th:text="${item.getValue()}" th:selected="*{role} == ${item}">
+                                                <option th:each="item:${T(com.techacademy.entity.Employee.Role).values()}" th:value="${item}" th:text="${item.getValue()}" th:selected="*{role} == ${item}"></option>
                                             </select>
                                         </div>
                                     </div>

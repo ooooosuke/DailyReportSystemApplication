@@ -52,33 +52,33 @@ public class EmployeeService {
         return ErrorKinds.SUCCESS;
     }
 
-    // 従業員更新
-    @Transactional
-    public ErrorKinds updateEmployee(String code, Employee updatedEmployee) {
-        Employee existingEmployee = findByCode(code);
-        if (existingEmployee == null) {
-            return ErrorKinds.DUPLICATE_ERROR;
+ // 従業員更新
+    @Transactional // トランザクション管理のアノテーション。メソッドがトランザクション内で実行されることを示します。
+    public ErrorKinds updateEmployee(String code, Employee updatedEmployee, Employee employee) {
+        Employee existingEmployee = findByCode(code); // 指定された従業員コードで既存の従業員データを取得
+        if (existingEmployee == null) { // 該当する従業員が見つからない場合の処理
+            return ErrorKinds.DUPLICATE_ERROR; // 重複エラーを返す（エラー種別が適切でない場合は修正が必要）
         }
 
-        if (updatedEmployee.getPassword() != null && !updatedEmployee.getPassword().isEmpty()) {
+        if (updatedEmployee.getPassword() != null && !updatedEmployee.getPassword().isEmpty()) { // パスワードが空でない場合のチェック
             // パスワードチェック
-            ErrorKinds result = employeePasswordCheck(updatedEmployee);
-            if (ErrorKinds.CHECK_OK != result) {
-                return result;
+            ErrorKinds result = employeePasswordCheck(updatedEmployee); // パスワードのバリデーションを行う
+            if (ErrorKinds.CHECK_OK != result) { // バリデーションに失敗した場合の処理
+                return result; // エラー種別を返す
             }
-            existingEmployee.setPassword(passwordEncoder.encode(updatedEmployee.getPassword()));
+            existingEmployee.setPassword(passwordEncoder.encode(updatedEmployee.getPassword())); // エンコードしたパスワードを設定
         }
 
-        existingEmployee.setName(updatedEmployee.getName());
-        existingEmployee.setRole(updatedEmployee.getRole());
-        existingEmployee.setDeleteFlg(false);
+        existingEmployee.setName(employee.getName()); // 従業員の名前を更新
+        existingEmployee.setRole(updatedEmployee.getRole()); // 従業員の役割を更新
+        existingEmployee.setDeleteFlg(false); // 削除フラグをfalseに設定
 
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(); // 現在の日時を取得
         existingEmployee.setCreatedAt(existingEmployee.getCreatedAt()); // 元の作成日時を保持
-        existingEmployee.setUpdatedAt(now);
+        existingEmployee.setUpdatedAt(now); // 更新日時を現在の日時に設定
 
-        employeeRepository.save(existingEmployee);
-        return ErrorKinds.SUCCESS;
+        employeeRepository.save(existingEmployee); // 既存の従業員データを更新して保存
+        return ErrorKinds.SUCCESS; // 更新成功を示す種別を返す
     }
 
     // 従業員削除

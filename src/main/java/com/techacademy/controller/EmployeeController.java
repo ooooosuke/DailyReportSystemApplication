@@ -98,39 +98,36 @@ public class EmployeeController {
         return "redirect:/employees";
     }
 
-    // 従業員更新画面
-    @GetMapping(value = "/{code}/update")
+ // 従業員更新画面
+    @GetMapping(value = "/{code}/update") 
     public String showUpdateEmployeeForm(@PathVariable String code, Model model) {
-        Employee employee = employeeService.findByCode(code);
-        if (employee != null) {
-            model.addAttribute("employee", employee);
-            return "employees/update";
-        }
-        return "redirect:/employees";
+        Employee existingEmployee = employeeService.findByCode(code); // 指定された従業員コードに対応する従業員をデータベースから取得
+        
+        model.addAttribute("employee", existingEmployee); // 取得した従業員データをモデルに追加
+        return "employees/update"; // 従業員更新画面テンプレートを返す
     }
 
-    // 従業員更新処理
-    @PostMapping(value = "/{code}/update")
-    public String updateEmployee(@PathVariable String code, @Validated Employee employee, BindingResult res, Model model) {
-        if (res.hasErrors()) {
-            return "employees/update";
+ // 従業員更新処理
+    @PostMapping(value = "/{code}/update") // URLパスの「/employees/{code}/update」に対応するPOSTリクエストを処理する
+    public String updateEmployee(@PathVariable String code, @Validated @ModelAttribute("employee") Employee employee, BindingResult res, Model model) {
+        if (res.hasErrors()) { // 入力バリデーションにエラーがある場合の処理
+            return "employees/update"; // エラーメッセージとともに更新画面を再表示する
         }
 
         try {
-            ErrorKinds result = employeeService.updateEmployee(code, employee);
-            if (ErrorMessage.contains(result)) {
-                model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
-                return "employees/update";
+            ErrorKinds result = employeeService.updateEmployee(code, employee, employee); // 従業員データを更新するためのサービスメソッドを呼び出す
+            if (ErrorMessage.contains(result)) { // 更新結果がエラーの場合の処理
+                model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result)); // エラーメッセージをモデルに追加
+                return "employees/update"; // エラーメッセージとともに更新画面を再表示する
             }
-        } catch (DataIntegrityViolationException e) {
+        } catch (DataIntegrityViolationException e) { // データ整合性違反が発生した場合の例外処理
             model.addAttribute(ErrorMessage.getErrorName(ErrorKinds.DUPLICATE_EXCEPTION_ERROR),
-                    ErrorMessage.getErrorValue(ErrorKinds.DUPLICATE_EXCEPTION_ERROR));
-            return "employees/update";
+                    ErrorMessage.getErrorValue(ErrorKinds.DUPLICATE_EXCEPTION_ERROR)); // 重複エラーメッセージをモデルに追加
+            return "employees/update"; // エラーメッセージとともに更新画面を再表示する
         }
 
-        return "redirect:/employees";
+        return "redirect:/employees"; // 正常に更新が完了した場合、従業員一覧ページにリダイレクト
     }
-
     // 従業員削除処理
     @PostMapping(value = "/{code}/delete")
     public String delete(@PathVariable String code, @AuthenticationPrincipal UserDetail userDetail, Model model) {

@@ -1,0 +1,40 @@
+<form th:action="@{/reports/add}" th:object="${report}" th:method="post">
+    <div class="wizard wizard-success mb-4">
+        <div class="mb-3">
+            <label class="form-label" for="date">日付</label>
+            <p class="mb-1"></p>
+            <div class="col-md-7">
+                <input class="form-control" type="date" th:field="*{date}" th:errorclass="err" id="date">
+                <span th:errors="*{date}" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="authorName">氏名</label>
+            <p class="mb-1"></p>
+            <div class="col-md-7">
+                <input class="form-control" type="text" th:field="*{authorName}" th:errorclass="err" id="authorName" readonly>
+                <span th:errors="*{authorName}" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="title">タイトル</label>
+            <p class="mb-1"></p>
+            <div class="col-md-7">
+                <input class="form-control" type="text" th:field="*{title}" th:errorclass="err" id="title">
+                <span th:errors="*{title}" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="content">内容</label>
+            <p class="mb-1"></p>
+            <div class="col-md-7">
+                <textarea class="form-control" th:field="*{content}" th:errorclass="err" id="content"></textarea>
+                <span th:errors="*{content}" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <p class="mt-5">
+        <input type="submit" value="登録" class="btn btn-primary">
+        <a th:href="@{/reports}" class="btn btn-secondary">戻る</a>
+    </p>
+</form>

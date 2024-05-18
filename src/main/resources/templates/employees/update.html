@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!DOCTYPE html>
 <html class="h-100" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 
 <head th:replace="common/header :: head_fragment(title=従業員更新)"></head>
@@ -23,16 +24,10 @@
                                 <div class="wizard wizard-success mb-4">
                                     <div class="mb-3">
                                         <label class="form-label" for="code">社員番号</label>
-                                        <p class="mb-1"></p>
-                                        <div class="col-md-7">
-                                            <input class="form-control" type="text" th:field="*{code}" th:errorclass="err" id="code" readonly>
-                                            <span th:errors="*{code}" class="text-danger"></span>
-                                            <span th:if="${codeError} neq null" th:text="${codeError}" class="text-danger"></span>
-                                        </div>
+                                        <p class="form-control-plaintext" th:text="${employee.code}"></p>
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label" for="name">氏名</label>
-                                        <p class="mb-1"></p>
                                         <div class="col-md-7">
                                             <input class="form-control" type="text" th:field="*{name}" th:errorclass="err" id="name">
                                             <span th:errors="*{name}" class="text-danger"></span>
@@ -48,7 +43,6 @@
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label" for="role">権限</label>
-                                        <p class="mb-1"></p>
                                         <div class="col-md-4">
                                             <select class="form-select" th:field="*{role}" id="role">
                                                 <option th:each="item : ${T(com.techacademy.entity.Employee$Role).values()}" th:value="${item}" th:text="${item.getValue()}" th:selected="*{role} == ${item}">

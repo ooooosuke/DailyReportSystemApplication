@@ -1,19 +1,18 @@
 package com.techacademy.service;
 
+import com.techacademy.constants.ErrorKinds;
+import com.techacademy.entity.Employee;
+import com.techacademy.repository.EmployeeRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import com.techacademy.constants.ErrorKinds;
-import com.techacademy.entity.Employee;
-import com.techacademy.repository.EmployeeRepository;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class EmployeeService {
@@ -48,37 +47,37 @@ public class EmployeeService {
         employee.setCreatedAt(now);
         employee.setUpdatedAt(now);
 
+        employee.setPassword(passwordEncoder.encode(employee.getPassword()));
         employeeRepository.save(employee);
         return ErrorKinds.SUCCESS;
     }
 
- // 従業員更新
-    @Transactional // トランザクション管理のアノテーション。メソッドがトランザクション内で実行されることを示します。
-    public ErrorKinds updateEmployee(String code, Employee updatedEmployee, Employee employee) {
-        Employee existingEmployee = findByCode(code); // 指定された従業員コードで既存の従業員データを取得
-        if (existingEmployee == null) { // 該当する従業員が見つからない場合の処理
-            return ErrorKinds.DUPLICATE_ERROR; // 重複エラーを返す（エラー種別が適切でない場合は修正が必要）
+    // 従業員更新
+    @Transactional
+    public ErrorKinds updateEmployee(String code, Employee updatedEmployee) {
+        Employee existingEmployee = findByCode(code);
+        if (existingEmployee == null) {
+            return ErrorKinds.DUPLICATE_ERROR;
         }
 
-        if (updatedEmployee.getPassword() != null && !updatedEmployee.getPassword().isEmpty()) { // パスワードが空でない場合のチェック
+        if (updatedEmployee.getPassword() != null && !updatedEmployee.getPassword().isEmpty()) {
             // パスワードチェック
-            ErrorKinds result = employeePasswordCheck(updatedEmployee); // パスワードのバリデーションを行う
-            if (ErrorKinds.CHECK_OK != result) { // バリデーションに失敗した場合の処理
-                return result; // エラー種別を返す
+            ErrorKinds result = employeePasswordCheck(updatedEmployee);
+            if (ErrorKinds.CHECK_OK != result) {
+                return result;
             }
-            existingEmployee.setPassword(passwordEncoder.encode(updatedEmployee.getPassword())); // エンコードしたパスワードを設定
+            existingEmployee.setPassword(passwordEncoder.encode(updatedEmployee.getPassword()));
         }
 
-        existingEmployee.setName(employee.getName()); // 従業員の名前を更新
-        existingEmployee.setRole(updatedEmployee.getRole()); // 従業員の役割を更新
-        existingEmployee.setDeleteFlg(false); // 削除フラグをfalseに設定
+        existingEmployee.setName(updatedEmployee.getName());
+        existingEmployee.setRole(updatedEmployee.getRole());
+        existingEmployee.setDeleteFlg(false);
 
-        LocalDateTime now = LocalDateTime.now(); // 現在の日時を取得
-        existingEmployee.setCreatedAt(existingEmployee.getCreatedAt()); // 元の作成日時を保持
-        existingEmployee.setUpdatedAt(now); // 更新日時を現在の日時に設定
+        LocalDateTime now = LocalDateTime.now();
+        existingEmployee.setUpdatedAt(now);
 
-        employeeRepository.save(existingEmployee); // 既存の従業員データを更新して保存
-        return ErrorKinds.SUCCESS; // 更新成功を示す種別を返す
+        employeeRepository.save(existingEmployee);
+        return ErrorKinds.SUCCESS;
     }
 
     // 従業員削除
@@ -94,6 +93,7 @@ public class EmployeeService {
         employee.setUpdatedAt(now);
         employee.setDeleteFlg(true);
 
+        employeeRepository.save(employee);
         return ErrorKinds.SUCCESS;
     }
 
@@ -107,8 +107,7 @@ public class EmployeeService {
         // findByIdで検索
         Optional<Employee> option = employeeRepository.findById(code);
         // 取得できなかった場合はnullを返す
-        Employee employee = option.orElse(null);
-        return employee;
+        return option.orElse(null);
     }
 
     // 従業員パスワードチェック
@@ -116,24 +115,19 @@ public class EmployeeService {
 
         // 従業員パスワードの半角英数字チェック処理
         if (isHalfSizeCheckError(employee)) {
-
             return ErrorKinds.HALFSIZE_ERROR;
         }
 
         // 従業員パスワードの8文字～16文字チェック処理
         if (isOutOfRangePassword(employee)) {
-
             return ErrorKinds.RANGECHECK_ERROR;
         }
-
-        employee.setPassword(passwordEncoder.encode(employee.getPassword()));
 
         return ErrorKinds.CHECK_OK;
     }
 
     // 従業員パスワードの半角英数字チェック処理
     private boolean isHalfSizeCheckError(Employee employee) {
-
         // 半角英数字チェック
         Pattern pattern = Pattern.compile("^[A-Za-z0-9]+$");
         Matcher matcher = pattern.matcher(employee.getPassword());
@@ -142,10 +136,8 @@ public class EmployeeService {
 
     // 従業員パスワードの8文字～16文字チェック処理
     public boolean isOutOfRangePassword(Employee employee) {
-
         // 桁数チェック
         int passwordLength = employee.getPassword().length();
         return passwordLength < 8 || 16 < passwordLength;
     }
-
 }

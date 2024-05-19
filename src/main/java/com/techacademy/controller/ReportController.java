@@ -3,10 +3,12 @@ package com.techacademy.controller;
 import com.techacademy.entity.Report;
 import com.techacademy.service.EmployeeService;
 import com.techacademy.service.ReportService;
+import com.techacademy.service.UserDetail;
 
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -54,40 +56,50 @@ public String detail(@PathVariable Long id, Model model) {
  return "redirect:/reports";
 }
 
-    // 日報新規登録画面
-    @GetMapping(value = "/add")
-    public String create(Model model) {
-        model.addAttribute("report", new Report()); // モデルに新しいReportオブジェクトを追加
-        return "reports/new";
-    }
+//日報新規登録画面
+@GetMapping(value = "/add")
+public String create(Model model, @AuthenticationPrincipal UserDetail userDetail) {
+    // 新しい Report オブジェクトをモデルに追加
+    model.addAttribute("report", new Report());
+ // ログイン中の従業員情報をモデルに追加
+    model.addAttribute("authorName", userDetail.getEmployee().getName());
+    return "reports/new";
+}
 
-    // 日報新規登録処理
-    @PostMapping(value = "/add")
-    public String add(@ModelAttribute Report report, Model model) {
-        // モック処理を追加しておく
-        return "redirect:/reports";
-    }
+// 日報新規登録処理
+@PostMapping(value = "/add")
+public String add(@ModelAttribute Report report, Model model) {
+    // 現在の従業員コードを設定（例: ログイン中の従業員コード）
+    // ここでは仮に "E001" とします。実際のアプリケーションではログイン情報を使用してください。
+    report.setEmployeeCode("E001");
 
-    // 日報更新画面
-    @GetMapping(value = "/{id}/update")
-    public String showUpdateReportForm(@PathVariable Long id, Model model) {
-        Report report = new Report(); // モックデータ
-        report.setId(id);
-        model.addAttribute("report", report); // モデルに追加
+    // 日報を保存
+    reportService.save(report);
+    return "redirect:/reports";
+}
+
+// 日報更新画面
+@GetMapping(value = "/{id}/update")
+public String showUpdateReportForm(@PathVariable Long id, Model model) {
+    Report report = reportService.findById(id);
+    if (report != null) {
+        model.addAttribute("report", report);
         return "reports/update";
     }
+    return "redirect:/reports";
+}
 
-    // 日報更新処理
-    @PostMapping(value = "/{id}/update")
-    public String updateReport(@PathVariable Long id, @ModelAttribute Report report, Model model) {
-        // モック処理を追加しておく
-        return "redirect:/reports";
-    }
+// 日報更新処理
+@PostMapping(value = "/{id}/update")
+public String updateReport(@PathVariable Long id, @ModelAttribute Report report, Model model) {
+    reportService.updateReport(id, report);
+    return "redirect:/reports";
+}
 
-    // 日報削除処理
-    @PostMapping(value = "/{id}/delete")
-    public String delete(@PathVariable Long id, Model model) {
-        // モック処理を追加しておく
-        return "redirect:/reports";
-    }
+// 日報削除処理
+@PostMapping(value = "/{id}/delete")
+public String delete(@PathVariable Long id, Model model) {
+    reportService.delete(id);
+    return "redirect:/reports";
+}
 }

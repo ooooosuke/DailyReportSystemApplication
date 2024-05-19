@@ -3,80 +3,71 @@ package com.techacademy.entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.SQLRestriction;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.Data;
 
+@Data
 @Entity
+@Table(name = "reports")
+@SQLRestriction("delete_flg = false")
 public class Report {
 
+    // ID (主キー、自動生成)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDate date;
-    private String authorName;
+    // 日付 (必須)
+    @Column(name = "report_date", nullable = false)
+    @NotNull
+    private LocalDate reportDate;
+
+    // タイトル (必須、最大長100)
+    @Column(length = 100, nullable = false)
+    @NotEmpty
+    @Size(max = 100)
     private String title;
+
+    // 内容 (必須、LONGTEXT)
+    @Lob
+    @Column(nullable = false)
+    @NotEmpty
     private String content;
+
+    // 従業員コード (必須、外部キー、最大長10)
+    @Column(name = "employee_code", length = 10, nullable = false)
+    @NotEmpty
+    @Size(max = 10)
+    private String employeeCode;
+
+    // 削除フラグ (論理削除)
+    @Column(name = "delete_flg", columnDefinition = "TINYINT", nullable = false)
+    private boolean deleteFlg = false;
+
+    // 登録日時 (必須)
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+
+    // 更新日時 (必須)
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    // Getters and setters
+    // 従業員名 (ビュー用、エンティティに格納しない)
+    @Transient
+    private String authorName;
 
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
 
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
-    public String getAuthorName() {
-        return authorName;
-    }
-
-    public void setAuthorName(String authorName) {
-        this.authorName = authorName;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
 }

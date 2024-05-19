@@ -27,9 +27,9 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr th:each="report : ${reportList}">
+                                         <tr th:each="report : ${reportList}">
                                             <td class="align-middle" th:text="${report.authorName}"></td>
-                                            <td class="align-middle" th:text="${#dates.format(report.date, 'yyyy-MM-dd')}"></td>
+                                            <td class="align-middle" th:text="${report.reportDate}"></td>
                                             <td class="align-middle" th:text="${report.title}"></td>
                                             <td class="align-middle"><a th:href="@{/reports/{id}/(id=${report.id})}" class="btn btn-primary">詳細</a></td>
                                         </tr>
@@ -39,7 +39,7 @@
                         </div>
                         <p class="mb-3" th:text="'全件（' + ${listSize} + '件）'"></p>
                         <div>
-                            <a th:href="@{/reports/add}" class="btn btn-primary">新規登録</a>
+                            <a th:href="@{/reports/add}" class="btn btn-primary">登録</a>
                         </div>
                     </div>
                 </div>

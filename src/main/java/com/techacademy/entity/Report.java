@@ -36,14 +36,15 @@ public class Report {
 
     // タイトル (必須、最大長100)
     @Column(length = 100, nullable = false)
-    @NotEmpty
+    @NotNull(message = "{report.title.notnull}")
     @Size(max = 100)
     private String title;
 
     // 内容 (必須、LONGTEXT)
     @Lob
     @Column(nullable = false)
-    @NotEmpty
+    @NotNull(message = "{report.contents.notnull}")
+    @Size(max = 600)
     private String content;
 
     // 従業員コード (必須、外部キー、最大長10)

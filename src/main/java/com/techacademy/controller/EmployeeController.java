@@ -49,22 +49,17 @@ public class EmployeeController {
     // 従業員新規登録処理
     @PostMapping(value = "/add")
     public String add(@Validated Employee employee, BindingResult res, Model model) {
-    System.out.println("step1");
         // パスワード空白チェック
         if ("".equals(employee.getPassword())) {
-            System.out.println("step2");
             // パスワードが空白だった場合
             model.addAttribute(ErrorMessage.getErrorName(ErrorKinds.BLANK_ERROR),
                     ErrorMessage.getErrorValue(ErrorKinds.BLANK_ERROR));
             return create(employee);
         }
-
         // 入力チェック
         if (res.hasErrors()) {
-            System.out.println("step3");
             return create(employee);
         }
-        System.out.println("step4");
         // 論理削除を行った従業員番号を指定すると例外となるためtry~catchで対応
         try {
             ErrorKinds result = employeeService.save(employee);

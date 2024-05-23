@@ -27,7 +27,7 @@ public class ReportService {
     @Transactional
     public ErrorKinds save(Report report) {
         // 業務チェック：同じ日付と従業員コードの日報が既に存在するか確認
-        Optional<Report> existingReport = reportRepository.findByReportDateAndEmployeeCode(report.getReportDate(), report.getEmployeeCode());
+        Optional<Report> existingReport = reportRepository.findByReportDateAndEmployeeCode(report.getReportDate(), report.getEmployee().getCode()); // 従業員コードで日報をチェック
         if (existingReport.isPresent()) {
             return ErrorKinds.DATECHECK_ERROR;
         }
@@ -61,7 +61,7 @@ public class ReportService {
         existingReport.setReportDate(updatedReport.getReportDate());
         existingReport.setTitle(updatedReport.getTitle());
         existingReport.setContent(updatedReport.getContent());
-        existingReport.setEmployeeCode(updatedReport.getEmployeeCode());
+        existingReport.setEmployee(updatedReport.getEmployee()); // リレーションを反映
         existingReport.setDeleteFlg(false);
 
         // 現在時刻を取得

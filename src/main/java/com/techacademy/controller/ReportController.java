@@ -28,13 +28,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("reports")
 public class ReportController {
     private final ReportService reportService;
-    private final EmployeeService employeeService;
 
     //依存性の注入
     @Autowired
     public ReportController(ReportService reportService, EmployeeService employeeService) {
         this.reportService = reportService;
-        this.employeeService = employeeService;
     }
 
     /// 日報一覧画面
@@ -42,8 +40,7 @@ public class ReportController {
     public String list(Model model) {
         List<Report> reports = reportService.findAll();
         for (Report report : reports) {
-            // 従業員名を取得して設定
-            String authorName = employeeService.findByCode(report.getEmployeeCode()).getName();
+            String authorName = report.getEmployee().getName(); // 従業員名を取得して設定
             report.setAuthorName(authorName);
         }
     model.addAttribute("reportList", reports);
@@ -53,7 +50,11 @@ public class ReportController {
     //日報詳細画面
     @GetMapping(value = "/{id}/")
     public String detail(@PathVariable Long id, Model model) {
-     model.addAttribute("report", reportService.findById(id));
+     Report report = reportService.findById(id);
+     // 従業員名を取得して設定
+     String authorName = report.getEmployee().getName();
+     report.setAuthorName(authorName);
+     model.addAttribute("report", report);
      return "reports/detail";
 }
 
@@ -61,8 +62,7 @@ public class ReportController {
     @GetMapping(value = "/add")
     public String create(Model model, @AuthenticationPrincipal UserDetail userDetail) {
         Report report = new Report();
-        // ログイン中の従業員コードを設定
-        report.setEmployeeCode(userDetail.getEmployee().getCode());
+        report.setEmployee(userDetail.getEmployee()); // ログイン中の従業員をセット
         model.addAttribute("report", report);
         model.addAttribute("authorName", userDetail.getEmployee().getName());
         return "reports/new";
@@ -73,28 +73,22 @@ public class ReportController {
     public String add(@Validated @ModelAttribute Report report, BindingResult res, Model model, @AuthenticationPrincipal UserDetail userDetail) {
         // 入力チェック
         if (res.hasErrors()) {
-            System.out.println("test1");
             model.addAttribute("authorName", userDetail.getEmployee().getName());
             model.addAttribute("report", report);
-            return "reports/new"; // エラーがある場合は再度新規登録画面を表示
+            return create(model,userDetail); // エラーがある場合は再度新規登録画面を表示
         }
-
         // ログイン中の従業員コードを再設定
-        report.setEmployeeCode(userDetail.getEmployee().getCode());
+        report.setEmployee(userDetail.getEmployee());
 
         // 業務チェック：同じ日付と従業員コードの日報が既に存在するか確認
         ErrorKinds result = reportService.save(report);
-        if (result == ErrorKinds.DATECHECK_ERROR) {
-            model.addAttribute("reportDateError", ErrorMessage.getErrorValue(result));
-            model.addAttribute("authorName", userDetail.getEmployee().getName());
-            model.addAttribute("report", report);
-            return "reports/new"; // エラーがある場合は再度新規登録画面を表示
+        if (ErrorMessage.contains(result)) {
+            model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
+            return create(model,userDetail); // エラーがある場合は再度新規登録画面を表示
         }
-
         // 成功した場合、日報一覧画面にリダイレクト
         return "redirect:/reports";
     }
-
 
     // 日報更新画面
     @GetMapping(value = "/{id}/update")
@@ -102,7 +96,6 @@ public class ReportController {
     Report report = reportService.findById(id);
         model.addAttribute("report", report);
         model.addAttribute("authorName", userDetail.getEmployee().getName());
-
     return "reports/update";
 }
 
@@ -126,7 +119,7 @@ public class ReportController {
         }
 
         // ログイン中の従業員コードを設定
-        report.setEmployeeCode(userDetail.getEmployee().getCode());
+        report.setEmployee(userDetail.getEmployee()); // ログイン中の従業員を再度セット
 
         // 日報を更新
         reportService.updateReport(id, report);

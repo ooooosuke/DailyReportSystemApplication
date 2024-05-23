@@ -58,7 +58,7 @@ public class ReportController {
      return "reports/detail";
 }
 
- // 日報新規登録画面
+     // 日報新規登録画面
     @GetMapping(value = "/add")
     public String create(Model model, @AuthenticationPrincipal UserDetail userDetail) {
         Report report = new Report();
@@ -75,7 +75,7 @@ public class ReportController {
         if (res.hasErrors()) {
             model.addAttribute("authorName", userDetail.getEmployee().getName());
             model.addAttribute("report", report);
-            return create(model,userDetail); // エラーがある場合は再度新規登録画面を表示
+            return "reports/new"; // エラーがある場合は新規登録画面を表示
         }
         // ログイン中の従業員コードを再設定
         report.setEmployee(userDetail.getEmployee());
@@ -84,7 +84,7 @@ public class ReportController {
         ErrorKinds result = reportService.save(report);
         if (ErrorMessage.contains(result)) {
             model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
-            return create(model,userDetail); // エラーがある場合は再度新規登録画面を表示
+            return "reports/new"; // エラーがある場合は新規登録画面を表示
         }
         // 成功した場合、日報一覧画面にリダイレクト
         return "redirect:/reports";

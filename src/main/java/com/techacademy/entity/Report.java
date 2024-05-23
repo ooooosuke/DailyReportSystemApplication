@@ -65,4 +65,5 @@ public class Report {
     // 従業員名 (ビュー用、エンティティに格納しない)
     @Transient
     private String authorName;
+
 }

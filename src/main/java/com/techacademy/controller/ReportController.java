@@ -40,12 +40,12 @@ public class ReportController {
     /// 日報一覧画面
     @GetMapping
     public String list(Model model) {
-    List<Report> reports = reportService.findAll();
-    for (Report report : reports) {
-        // 従業員名を取得して設定
-        String authorName = employeeService.findByCode(report.getEmployeeCode()).getName();
-        report.setAuthorName(authorName);  // 修正箇所: setAuthorName メソッドを使用
-    }
+        List<Report> reports = reportService.findAll();
+        for (Report report : reports) {
+            // 従業員名を取得して設定
+            String authorName = employeeService.findByCode(report.getEmployeeCode()).getName();
+            report.setAuthorName(authorName);
+        }
     model.addAttribute("reportList", reports);
     model.addAttribute("listSize", reports.size());
     return "reports/list";
@@ -57,41 +57,44 @@ public class ReportController {
      return "reports/detail";
 }
 
-    // 日報新規登録画面
+ // 日報新規登録画面
     @GetMapping(value = "/add")
     public String create(Model model, @AuthenticationPrincipal UserDetail userDetail) {
-        model.addAttribute("report", new Report()); // 新しいReportオブジェクトをモデルに追加
-        model.addAttribute("authorName", userDetail.getEmployee().getName()); // ログイン中の従業員の名前をモデルに追加
-        return "reports/new"; // 新規登録画面のテンプレートを返す
+        Report report = new Report();
+        // ログイン中の従業員コードを設定
+        report.setEmployeeCode(userDetail.getEmployee().getCode());
+        model.addAttribute("report", report);
+        model.addAttribute("authorName", userDetail.getEmployee().getName());
+        return "reports/new";
     }
- // 日報新規登録処理
+
+    // 日報新規登録処理
     @PostMapping(value = "/add")
     public String add(@Validated @ModelAttribute Report report, BindingResult res, Model model, @AuthenticationPrincipal UserDetail userDetail) {
-        System.out.println("step1");
         // 入力チェック
         if (res.hasErrors()) {
-            System.out.println("step2");
-            System.out.println(res.toString());
+            System.out.println("test1");
             model.addAttribute("authorName", userDetail.getEmployee().getName());
-            model.addAttribute("report", report); // エラー時にreportオブジェクトをモデルに追加
-            return create(model, userDetail);
+            model.addAttribute("report", report);
+            return "reports/new"; // エラーがある場合は再度新規登録画面を表示
         }
 
+        // ログイン中の従業員コードを再設定
+        report.setEmployeeCode(userDetail.getEmployee().getCode());
 
-
-     // 業務チェック：同じ日付と従業員コードの日報が既に存在するか確認
+        // 業務チェック：同じ日付と従業員コードの日報が既に存在するか確認
         ErrorKinds result = reportService.save(report);
         if (result == ErrorKinds.DATECHECK_ERROR) {
-            System.out.println("step3");
             model.addAttribute("reportDateError", ErrorMessage.getErrorValue(result));
             model.addAttribute("authorName", userDetail.getEmployee().getName());
-            model.addAttribute("report", report); // エラー時にreportオブジェクトを再度モデルに追加
-            return create(model, userDetail); // 新規登録画面を再表示
+            model.addAttribute("report", report);
+            return "reports/new"; // エラーがある場合は再度新規登録画面を表示
         }
 
         // 成功した場合、日報一覧画面にリダイレクト
         return "redirect:/reports";
     }
+
 
     // 日報更新画面
     @GetMapping(value = "/{id}/update")

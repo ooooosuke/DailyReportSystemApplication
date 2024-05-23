@@ -47,7 +47,6 @@ public class EmployeeService {
         employee.setCreatedAt(now);
         employee.setUpdatedAt(now);
 
-        employee.setPassword(passwordEncoder.encode(employee.getPassword()));
         employeeRepository.save(employee);
         return ErrorKinds.SUCCESS;
     }

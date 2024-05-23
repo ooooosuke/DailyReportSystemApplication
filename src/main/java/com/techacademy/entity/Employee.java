@@ -2,7 +2,6 @@
 package com.techacademy.entity;
 
 import java.time.LocalDateTime;
-
 import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.validator.constraints.Length;
 
@@ -69,5 +68,6 @@ public class Employee {
     // 更新日時
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
 
 }

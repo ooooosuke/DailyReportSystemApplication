@@ -42,6 +42,15 @@ public class ErrorMessage {
             put(ErrorKinds.PASSWORD_RANGECHECK_ERROR, new ArrayList<String>(Arrays.asList("passwordError", "8文字以上16文字以下で入力してください")));
             // パスワード形式チェック用エラーメッセージ
             put(ErrorKinds.PASSWORD_FORMAT_ERROR, new ArrayList<String>(Arrays.asList("passwordError", "パスワードは半角英数字のみで入力してください")));
+
+            // 日報タイトル空白チェック用エラーメッセージ
+            put(ErrorKinds.REPORT_TITLE_BLANK_ERROR, new ArrayList<String>(Arrays.asList("titleError", "値を入力してください")));
+            // 日報タイトル桁数チェック用エラーメッセージ
+            put(ErrorKinds.REPORT_TITLE_RANGECHECK_ERROR, new ArrayList<String>(Arrays.asList("titleError", "100文字以下で入力してください")));
+            // 日報内容空白チェック用エラーメッセージ
+            put(ErrorKinds.REPORT_CONTENT_BLANK_ERROR, new ArrayList<String>(Arrays.asList("contentError", "値を入力してください")));
+            // 日報内容桁数チェック用エラーメッセージ
+            put(ErrorKinds.REPORT_CONTENT_RANGECHECK_ERROR, new ArrayList<String>(Arrays.asList("contentError", "600文字以下で入力してください")));
         }
     };
 

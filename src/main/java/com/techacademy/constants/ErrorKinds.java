@@ -31,6 +31,13 @@ public enum ErrorKinds {
     // パスワード桁数チェックエラー
     PASSWORD_RANGECHECK_ERROR,
     // パスワード形式チェックエラー
-    PASSWORD_FORMAT_ERROR;
-
+    PASSWORD_FORMAT_ERROR,
+ // 日報タイトル空白チェックエラー
+    REPORT_TITLE_BLANK_ERROR,
+    // 日報タイトル桁数チェックエラー
+    REPORT_TITLE_RANGECHECK_ERROR,
+    // 日報内容空白チェックエラー
+    REPORT_CONTENT_BLANK_ERROR,
+    // 日報内容桁数チェックエラー
+    REPORT_CONTENT_RANGECHECK_ERROR
 }

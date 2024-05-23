@@ -1,5 +1,6 @@
 package com.techacademy.service;
 
+import com.techacademy.constants.ErrorKinds;
 import com.techacademy.entity.Report;
 import com.techacademy.repository.ReportRepository;
 
@@ -24,20 +25,26 @@ public class ReportService {
 
     // 日報保存
     @Transactional
-    public void save(Report report) {
-        // 現在時刻を取得
-        LocalDateTime now = LocalDateTime.now();
-        // 登録日時が設定されていない場合にのみ設定
-        if (report.getCreatedAt() == null) {
-            report.setCreatedAt(now);
+    public ErrorKinds save(Report report) {
+        // 業務チェック：同じ日付と従業員コードの日報が既に存在するか確認
+        Optional<Report> existingReport = reportRepository.findByReportDateAndEmployeeCode(report.getReportDate(), report.getEmployeeCode());
+        if (existingReport.isPresent()) {
+            return ErrorKinds.DATECHECK_ERROR;
         }
-        // 更新日時を現在時刻に設定
-        report.setUpdatedAt(now);
+
         // 削除フラグを false に設定
         report.setDeleteFlg(false);
 
+        // 現在時刻を取得
+        LocalDateTime now = LocalDateTime.now();
+        // 登録日時を現在時刻に設定
+        report.setCreatedAt(now);
+        // 更新日時を現在時刻に設定
+        report.setUpdatedAt(now);
+
         // 日報をリポジトリに保存
         reportRepository.save(report);
+        return ErrorKinds.SUCCESS;
     }
 
     // 日報更新
@@ -98,7 +105,7 @@ public class ReportService {
         return option.orElse(null);
     }
 
- // 指定した日付と従業員コードで日報を検索
+    // 指定した日付と従業員コードで日報を検索
     public Optional<Report> findByReportDateAndEmployeeCode(LocalDate reportDate, String employeeCode) {
         return reportRepository.findByReportDateAndEmployeeCode(reportDate, employeeCode);
     }

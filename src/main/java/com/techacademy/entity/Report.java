@@ -2,20 +2,18 @@ package com.techacademy.entity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
 import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.validator.constraints.Length;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
@@ -36,21 +34,20 @@ public class Report {
 
     // タイトル (必須、最大長100)
     @Column(length = 100, nullable = false)
-    @NotNull(message = "{report.title.notnull}")
-    @Size(max = 100)
+    @NotNull
+    @Length(max = 100)
     private String title;
 
     // 内容 (必須、LONGTEXT)
-    @Lob
-    @Column(nullable = false)
-    @NotNull(message = "{report.contents.notnull}")
-    @Size(max = 600)
+    @Column(length=600, nullable = false)
+    @NotEmpty
+    @Length(max = 600)
     private String content;
 
     // 従業員コード (必須、外部キー、最大長10)
     @Column(name = "employee_code", length = 10, nullable = false)
     @NotEmpty
-    @Size(max = 10)
+    @Length(max = 10)
     private String employeeCode;
 
     // 削除フラグ (論理削除)
@@ -68,7 +65,4 @@ public class Report {
     // 従業員名 (ビュー用、エンティティに格納しない)
     @Transient
     private String authorName;
-
-
-
 }

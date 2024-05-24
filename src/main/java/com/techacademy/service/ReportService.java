@@ -1,6 +1,7 @@
 package com.techacademy.service;
 
 import com.techacademy.constants.ErrorKinds;
+import com.techacademy.entity.Employee;
 import com.techacademy.entity.Report;
 import com.techacademy.repository.ReportRepository;
 
@@ -21,6 +22,14 @@ public class ReportService {
     @Autowired
     public ReportService(ReportRepository reportRepository) {
         this.reportRepository = reportRepository;
+    }
+    // ユーザー権限に応じたリポート取得
+    public List<Report> findReportsByUser(UserDetail userDetail) {
+        if (userDetail.isAdmin()) {
+            return reportRepository.findAll();
+        } else {
+            return reportRepository.findByEmployeeCode(userDetail.getEmployee().getCode());
+        }
     }
 
     // 日報保存
@@ -79,6 +88,11 @@ public class ReportService {
         // 日報を保存
         reportRepository.save(existingReport);
         return ErrorKinds.SUCCESS;
+    }
+
+ // 指定した従業員に紐づいた日報を取得するメソッドを追加
+    public List<Report> findByEmployee(Employee employee) {
+        return reportRepository.findByEmployee(employee);
     }
 
     // 日報削除

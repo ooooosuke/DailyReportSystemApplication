@@ -32,18 +32,18 @@ public class ReportController {
         this.reportService = reportService;
     }
 
-    /// 日報一覧画面
+    // 日報一覧画面
     @GetMapping
-    public String list(Model model) {
-        List<Report> reports = reportService.findAll();
+    public String list(Model model, @AuthenticationPrincipal UserDetail userDetail) {
+        List<Report> reports = reportService.findReportsByUser(userDetail);
         for (Report report : reports) {
             String authorName = report.getEmployee().getName(); // 従業員名を取得して設定
             report.setAuthorName(authorName);
         }
-    model.addAttribute("reportList", reports);
-    model.addAttribute("listSize", reports.size());
-    return "reports/list";
-}
+        model.addAttribute("reportList", reports);
+        model.addAttribute("listSize", reports.size());
+        return "reports/list";
+    }
     //日報詳細画面
     @GetMapping(value = "/{id}/")
     public String detail(@PathVariable Long id, Model model) {
@@ -118,10 +118,11 @@ public class ReportController {
         return "redirect:/reports";
     }
 
-    // 日報削除処理
+
+ // 日報削除処理
     @PostMapping(value = "/{id}/delete")
     public String delete(@PathVariable Long id, Model model) {
-    reportService.delete(id);
-    return "redirect:/reports";
-}
+        reportService.delete(id);
+        return "redirect:/reports";
+    }
 }

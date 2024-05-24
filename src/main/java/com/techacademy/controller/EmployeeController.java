@@ -62,11 +62,14 @@ public class EmployeeController {
         }
         // 論理削除を行った従業員番号を指定すると例外となるためtry~catchで対応
         try {
+            // employeeService.save(employee) メソッドを呼び出して従業員情報を保存
             ErrorKinds result = employeeService.save(employee);
+            // エラーメッセージがある場合、モデルにエラーメッセージを追加して新規登録画面に戻る
             if (ErrorMessage.contains(result)) {
                 model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
                 return create(employee);
             }
+         // DataIntegrityViolationException が発生した場合の処理
         } catch (DataIntegrityViolationException e) {
             model.addAttribute(ErrorMessage.getErrorName(ErrorKinds.DUPLICATE_EXCEPTION_ERROR),
                     ErrorMessage.getErrorValue(ErrorKinds.DUPLICATE_EXCEPTION_ERROR));

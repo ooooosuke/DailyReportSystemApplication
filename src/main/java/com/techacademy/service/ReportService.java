@@ -49,12 +49,18 @@ public class ReportService {
 
     // 日報更新
     @Transactional
-    public void updateReport(Long id, Report updatedReport) {
+    public ErrorKinds updateReport(Long id, Report updatedReport) {
         // IDに対応する既存の日報を検索
         Report existingReport = findById(id);
         if (existingReport == null) {
             // 日報が見つからない場合は例外をスロー
             throw new IllegalArgumentException("Report not found");
+        }
+
+        // 業務チェック：同じ日付と従業員コードの日報が既に存在するか確認
+        Optional<Report> duplicateReport = reportRepository.findByReportDateAndEmployeeCode(updatedReport.getReportDate(), updatedReport.getEmployee().getCode());
+        if (duplicateReport.isPresent() && !duplicateReport.get().getId().equals(id)) {
+            return ErrorKinds.DATECHECK_ERROR;
         }
 
         // 更新内容を反映
@@ -64,6 +70,7 @@ public class ReportService {
         existingReport.setEmployee(updatedReport.getEmployee()); // リレーションを反映
         existingReport.setDeleteFlg(false);
 
+
         // 現在時刻を取得
         LocalDateTime now = LocalDateTime.now();
         // 更新日時を現在時刻に設定
@@ -71,6 +78,7 @@ public class ReportService {
 
         // 日報を保存
         reportRepository.save(existingReport);
+        return ErrorKinds.SUCCESS;
     }
 
     // 日報削除

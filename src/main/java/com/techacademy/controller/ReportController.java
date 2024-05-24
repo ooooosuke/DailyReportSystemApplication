@@ -1,7 +1,6 @@
 package com.techacademy.controller;
 
 import com.techacademy.constants.ErrorKinds;
-import com.techacademy.constants.ErrorMessage;
 import com.techacademy.entity.Report;
 import com.techacademy.service.EmployeeService;
 import com.techacademy.service.ReportService;
@@ -10,8 +9,6 @@ import com.techacademy.service.UserDetail;
 import jakarta.validation.Valid;
 
 import java.util.List;
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -82,9 +79,9 @@ public class ReportController {
 
         // 業務チェック：同じ日付と従業員コードの日報が既に存在するか確認
         ErrorKinds result = reportService.save(report);
-        if (ErrorMessage.contains(result)) {
-            model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
-            return "reports/new"; // エラーがある場合は新規登録画面を表示
+        if (result == ErrorKinds.DATECHECK_ERROR) {
+            model.addAttribute("reportDateError", "既に登録されている日付です");
+            return create(model,userDetail); // エラーがある場合は再度新規登録画面を表示
         }
         // 成功した場合、日報一覧画面にリダイレクト
         return "redirect:/reports";
@@ -109,21 +106,15 @@ public class ReportController {
             return "reports/update";
         }
 
-        // 業務チェック：同じ日付と従業員コードの日報が既に存在するか確認
-        Optional<Report> existingReport = reportService.findByReportDateAndEmployeeCode(report.getReportDate(), userDetail.getEmployee().getCode());
-        if (existingReport.isPresent() && !existingReport.get().getId().equals(id)) {
-            model.addAttribute(ErrorMessage.getErrorName(ErrorKinds.DATECHECK_ERROR), ErrorMessage.getErrorValue(ErrorKinds.DATECHECK_ERROR));
-            model.addAttribute("authorName", userDetail.getEmployee().getName());
-            model.addAttribute("report", report); // エラーがある場合、既存のレポートオブジェクトを保持
-            return "reports/update";
-        }
-
         // ログイン中の従業員コードを設定
         report.setEmployee(userDetail.getEmployee()); // ログイン中の従業員を再度セット
 
-        // 日報を更新
-        reportService.updateReport(id, report);
-
+        // 業務チェック：同じ日付と従業員コードの日報が既に存在するか確認
+        ErrorKinds result = reportService.updateReport(id,report);
+        if (result == ErrorKinds.DATECHECK_ERROR) {
+            model.addAttribute("reportDateError", "既に登録されている日付です");
+            return create(model,userDetail); // エラーがある場合は再度新規登録画面を表示
+        }
         return "redirect:/reports";
     }
 

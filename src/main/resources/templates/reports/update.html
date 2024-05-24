@@ -24,6 +24,7 @@
                                             <!-- Date formatting -->
                                             <input class="form-control" type="date" th:field="*{reportDate}" th:errorclass="err" id="reportDate" th:value="${#temporals.format(report.reportDate, 'yyyy-MM-dd')}">
                                             <span th:errors="*{reportDate}" class="text-danger"></span>
+                                             <span th:if="${reportDateError != null}" th:text="${reportDateError}" class="text-danger"></span> <!-- 業務チェックエラー表示 -->
                                         </div>
                                     </div>
                                     <div class="mb-3">

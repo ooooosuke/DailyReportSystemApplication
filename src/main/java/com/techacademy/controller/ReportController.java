@@ -46,6 +46,10 @@ public class ReportController {
         } else {
             reports = reportService.findByEmployee(userDetail.getEmployee());
         }
+        for (Report report : reports) {
+            String authorName = report.getEmployee().getName(); // 従業員名を取得して設定
+            report.setAuthorName(authorName);
+        }
         model.addAttribute("reportList", reports);
         model.addAttribute("listSize", reports.size());
         return "reports/list";

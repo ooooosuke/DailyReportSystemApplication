@@ -38,6 +38,11 @@ public class EmployeeService {
         if (ErrorKinds.CHECK_OK != result) {
             return result;
         }
+        // パスワードのハッシュ化
+        if (employee.getPassword() != null && !employee.getPassword().isEmpty()) {
+            String encodedPassword = passwordEncoder.encode(employee.getPassword());
+            employee.setPassword(encodedPassword);
+        }
 
         // 従業員番号重複チェック
         if (findByCode(employee.getCode()) != null) {

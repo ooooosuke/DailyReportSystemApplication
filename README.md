@@ -43,9 +43,14 @@
 * `reports` (日報テーブル)
 
 ## 環境構築・起動手順
+本アプリケーションの実行環境（Dockerコンテナ）の構築手順やDockerfileについては、以下のデプロイ用リポジトリを参照してください。
 
-### 1. データベースのセットアップ
-MySQLに本システム用のデータベースとユーザーを作成します。
-DBViewer等のクライアントツールからMySQLに接続し、以下の初期化スクリプトを実行してください。
-```text
-src/main/resources/setup-database.sql
+⇒ **[DailyReportApplication（デプロイ用リポジトリ）](https://github.com/ooooosuke/DailyReportApplication/tree/master)** 
+
+
+上記リポジトリの手順に従うことで、Webサーバー（Apache + Java）およびDBサーバー（MySQL）の環境が自動で構築されます。
+
+## テスト用ログインアカウント
+デプロイ完了後、以下の初期データでログイン可能です。
+* **管理者**: 社員番号 `1` / パスワード `kirataro`
+* **一般**: 社員番号 `2` / パスワード `tanataro`
